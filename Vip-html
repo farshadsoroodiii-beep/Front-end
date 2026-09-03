@@ -1,0 +1,18 @@
+<!------------slider-vip------>
+<section class="xlux-slider-section">
+
+  <button type="button" class="xlux-slider-nav xlux-prev">
+    ❮
+  </button>
+
+  <div class="xlux-slider-container" id="xlux-slider">
+    <!-- کارت‌ها با fetch ساخته می‌شوند -->
+  </div>
+
+  <button type="button" class="xlux-slider-nav xlux-next">
+    ❯
+  </button>
+
+  <div class="xlux-indicator-wrapper" id="xlux-indicators"></div>
+
+</section>
