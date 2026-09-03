@@ -1,0 +1,27 @@
+frontend\css\meno-tab4.css
+.cars-widget-full { max-width:1200px; margin:20px auto; border-radius:12px; padding:20px; background:#fff; box-shadow:0 4px 16px rgba(0,0,0,0.1); }
+[data-tab-btns-full] { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+[data-tab-btns-full] button { padding:8px 18px; border:none; border-radius:12px; background:#e5e7eb; cursor:pointer; font-size:1rem; transition:all 0.3s; }
+[data-tab-btns-full] button.active { background:linear-gradient(135deg,#053a54,#016a90); color:#fff; }
+[data-tab-content-full] {display:none;}
+[data-tab-content-full].active {display:block;}
+.cars-grid-full { display:grid; gap:15px; }
+@media(max-width:768px){.cars-grid-full {grid-template-columns:repeat(2,1fr);}}
+@media(min-width:769px){.cars-grid-full {grid-template-columns:repeat(4,1fr);}}
+.cars-card-full { position:relative; border-radius:12px; overflow:hidden; aspect-ratio:1/1; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.15); opacity:0; transform:translateY(40px) scale(0.9); transition:transform .5s cubic-bezier(0.25,1,0.5,1), opacity .5s ease, filter .5s ease; }
+.cars-card-full.show { opacity:1; transform:translateY(0) scale(1); filter:drop-shadow(0 0 15px rgba(5,42,68,0.5)); }
+.top-img { position:absolute; top:0; left:0; right:0; bottom:42%; overflow:hidden; z-index:2; }
+.top-img img { width:100%; height:100%; object-fit:cover; transition:transform .5s ease, filter .5s ease; }
+.cars-card-full:hover .top-img img { transform:scale(1.05); filter:brightness(1.2); }
+.bottom-img { position:absolute; left:0; right:0; bottom:0; height:42%; background-size:200%; background-position:center bottom; filter:blur(15px); z-index:0; transition:none; }
+.bottom-overlay { position:absolute; left:0; right:0; bottom:0; height:42%; background:rgba(5,42,68,0.25); backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px); display:flex; justify-content:space-between; align-items:flex-start; padding:8px; box-sizing:border-box; border-top:1px solid rgba(255,255,255,0.1); z-index:3; }
+.bottom-overlay .left { display:flex; flex-direction:column; gap:2px; }
+.bottom-overlay h3 {margin:0; font-size:0.8rem;}
+.bottom-overlay .details { font-size:0.55rem; display:flex; flex-direction:column; gap:1px; }
+@media(min-width:900px){.bottom-overlay .details { font-size:0.75rem; }}
+.bottom-overlay .btn { background:linear-gradient(135deg,#053a54,#016a90); color:#fff; text-decoration:none; padding:8px 10px; border-radius:6px; font-size:0.65rem; transition:all .3s; }
+.bottom-overlay .btn:hover { transform:scale(1.1); background:linear-gradient(135deg,#064b6d,#0e95c6); }
+.cars-pagination-wrapper-full { display:flex; justify-content:center; align-items:center; gap:6px; margin-top:15px; }
+.cars-page-square-full, .cars-page-btn-full { display:flex; justify-content:center; align-items:center; width:36px; height:36px; background:#e5e7eb; color:#333; font-size:0.85rem; font-weight:500; cursor:pointer; transition:all .3s; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+.cars-page-square-full.active { background:linear-gradient(135deg,#053a54,#016a90); color:#fff; transform:scale(1.1); }
+.cars-page-square-full:hover, .cars-page-btn-full:hover { background:linear-gradient(135deg,#064b6d,#0e95c6); color:#fff; }
