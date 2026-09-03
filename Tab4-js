@@ -1,0 +1,546 @@
+frontend\js\front-js-fetch\meno-tab4-fetch.js
+(() => {
+
+  'use strict';
+
+  const cardsPerPage = 4;
+
+  /*
+  ========================================
+      Tab -> Site Section Mapping
+  ========================================
+  */
+
+  const TAB_SECTION_MAP = {
+
+    tab1: 'suv',
+
+    tab2: 'sedan',
+
+    tab3: 'van',
+
+    tab4: 'truck'
+
+  };
+
+  /*
+  ========================================
+      Fetch Cars
+  ========================================
+  */
+
+  async function fetchTabCars(tab) {
+
+    try {
+
+      const sectionSlug =
+        TAB_SECTION_MAP[tab];
+
+      if (!sectionSlug) {
+
+        return [];
+
+      }
+
+      const response =
+
+        await API.get(
+
+          `/site-sections/${sectionSlug}/cars`
+
+        );
+
+      const cars =
+
+        Array.isArray(response)
+
+          ? response
+
+          : (response.data || []);
+
+      return CarMapper.mapList(cars);
+
+    } catch (error) {
+
+      console.error(
+
+        'Tab4 Fetch Error:',
+
+        error
+
+      );
+
+      return [];
+
+    }
+
+  }
+
+  /*
+  ========================================
+      Render Page
+  ========================================
+  */
+
+  function renderPage(
+
+    grid,
+
+    pagination,
+
+    cars,
+
+    page = 1
+
+  ) {
+
+    if (!cars || cars.length === 0) {
+
+      grid.innerHTML =
+
+        '<p style="padding:20px">خودرویی ثبت نشده</p>';
+
+      pagination.innerHTML = '';
+
+      return;
+
+    }
+
+    const totalPages =
+
+      Math.ceil(
+
+        cars.length / cardsPerPage
+
+      );
+
+    const start =
+
+      (page - 1) * cardsPerPage;
+
+    const pageCars =
+
+      cars.slice(
+
+        start,
+
+        start + cardsPerPage
+
+      );
+
+    grid.innerHTML = '';
+
+    pageCars.forEach((car) => {
+
+      const coverUrl =
+
+        car.cover || 'images/placeholder.jpg';
+
+      const card =
+
+        document.createElement('div');
+
+      card.className =
+
+        'cars-card-full';
+
+      card.innerHTML = `
+
+        <div class="top-img">
+
+          <a
+
+            href="${car.manufacturerUrl || '#'}"
+
+            target="_blank"
+
+            rel="noopener"
+
+          >
+
+            <img
+
+              src="${coverUrl}"
+
+              loading="lazy"
+
+              alt="${car.title || ''}"
+
+            >
+
+          </a>
+
+        </div>
+
+        <div
+
+          class="bottom-img"
+
+          style="background-image:url('${coverUrl}')"
+
+        >
+
+        </div>
+
+        <div class="bottom-overlay">
+
+          <div class="left">
+
+            <h3>
+
+              ${car.title || ''}
+
+            </h3>
+
+            <div class="details">
+
+              <span>
+
+                سال: ${car.year || '-'}
+
+              </span>
+
+              <span>
+
+                کارکرد: ${car.mileage || '-'}
+
+              </span>
+
+              <span>
+
+                قیمت: ${car.price || '-'}
+
+              </span>
+
+            </div>
+
+          </div>
+          <a
+
+            href="#"
+
+            class="btn order-btn"
+
+            data-car='${JSON.stringify({
+
+              id: car.id,
+
+              slug: car.slug,
+
+              title: car.title,
+
+              price: car.price,
+
+              oldPrice: car.oldPrice,
+
+              year: car.year,
+
+              mileage: car.mileage,
+
+              color: car.color,
+
+              gearbox: car.gearbox,
+
+              fuel: car.fuel,
+
+              image: coverUrl
+
+            })}'
+
+          >
+
+            ثبت سفارش
+
+          </a>
+
+        </div>
+
+      `;
+
+      grid.appendChild(card);
+
+      const orderBtn =
+
+        card.querySelector(
+
+          '.order-btn'
+
+        );
+
+      orderBtn?.addEventListener(
+
+        'click',
+
+        (event) => {
+
+          event.preventDefault();
+
+          const carData =
+
+            JSON.parse(
+
+              orderBtn.dataset.car
+
+            );
+
+          Storage.Local.set(
+
+            Storage.KEYS.SELECTED_CAR,
+
+            carData
+
+          );
+
+          window.location.href =
+
+            'order.html';
+
+        }
+
+      );
+
+      setTimeout(() => {
+
+        card.classList.add(
+
+          'show'
+
+        );
+
+      }, 50);
+
+    });
+
+    /*
+    ========================================
+        Pagination
+    ========================================
+    */
+
+    pagination.innerHTML = '';
+
+    for (
+
+      let i = 1;
+
+      i <= totalPages;
+
+      i++
+
+    ) {
+
+      const btn =
+
+        document.createElement('div');
+
+      btn.className =
+
+        'cars-page-square-full' +
+
+        (
+
+          i === page
+
+            ? ' active'
+
+            : ''
+
+        );
+
+      btn.textContent = i;
+
+      btn.onclick = () =>
+
+        renderPage(
+
+          grid,
+
+          pagination,
+
+          cars,
+
+          i
+
+        );
+
+      pagination.appendChild(btn);
+
+    }
+
+  }
+
+  /*
+  ========================================
+      Init Widget
+  ========================================
+  */
+
+  async function initWidget(widget) {
+
+    const btns =
+
+      widget.querySelectorAll(
+
+        '[data-tab-btns-full] button'
+
+      );
+
+    const contents =
+
+      widget.querySelectorAll(
+
+        '[data-tab-content-full]'
+
+      );
+
+    const cache = {};
+
+    for (const btn of btns) {
+
+      const tab =
+
+        btn.dataset.tab;
+
+      cache[tab] =
+
+        await fetchTabCars(tab);
+
+    }
+
+    btns.forEach((btn) => {
+
+      btn.addEventListener(
+
+        'click',
+
+        () => {
+
+          btns.forEach((b) =>
+
+            b.classList.remove(
+
+              'active'
+
+            )
+
+          );
+
+          contents.forEach((c) =>
+
+            c.classList.remove(
+
+              'active'
+
+            )
+
+          );
+
+          btn.classList.add(
+
+            'active'
+
+          );
+
+          const tabContent =
+
+            widget.querySelector(
+
+              '#' + btn.dataset.tab
+
+            );
+
+          if (!tabContent) {
+
+            return;
+
+          }
+
+          tabContent.classList.add(
+
+            'active'
+
+          );
+
+          renderPage(
+
+            tabContent.querySelector(
+
+              '[data-grid-full]'
+
+            ),
+
+            tabContent.querySelector(
+
+              '[data-pagination-full]'
+
+            ),
+
+            cache[btn.dataset.tab]
+
+          );
+
+        }
+
+      );
+
+    });
+
+    /*
+    ========================================
+        Initial Render
+    ========================================
+    */
+
+    contents.forEach((tab) => {
+
+      const grid =
+
+        tab.querySelector(
+
+          '[data-grid-full]'
+
+        );
+
+      const pagination =
+
+        tab.querySelector(
+
+          '[data-pagination-full]'
+
+        );
+
+      renderPage(
+
+        grid,
+
+        pagination,
+
+        cache[tab.id]
+
+      );
+
+    });
+
+  }
+
+  /*
+  ========================================
+      Start
+  ========================================
+  */
+
+  document
+
+    .querySelectorAll(
+
+      '[data-widget-full]'
+
+    )
+
+    .forEach((widget) => {
+
+      initWidget(widget);
+
+    });
+
+})();
